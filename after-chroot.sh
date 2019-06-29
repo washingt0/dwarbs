@@ -1,19 +1,5 @@
 #! /bin/sh
 
-echo 'Make sure you have set:
-    INSTALL_HOST -> hostname of installation
-    DOTFILE_REPO -> GIT repository of dot files
-'
-
-read -p "Continue (y/n)? " choice
-case "$choice" in
-  y|Y ) echo "Ok, let's do this";;
-  n|N ) exit 1;;
-  * ) echo "invalid";;
-esac
-
-# TODO user creation
-
 echo 'Setting time zone'
 ln -sf /usr/share/zoneinfo/America/Fortaleza /etc/localtime
 
@@ -33,7 +19,7 @@ echo 'LANG=en_US.UTF-8' >> /etc/locale.conf
 echo 'Persisting keyboard layout'
 echo 'KEYMAP=br-abnt2' >> /etc/vconsole.conf
 
-echo 'Setting hostname from `INSTALL_HOST` environment variable'
+read -p 'Enter the hostname: ' INSTALL_HOST
 echo $INSTALL_HOST >> /etc/hostname
 
 echo 'Gerenating local hosts'
@@ -44,6 +30,15 @@ mkinitcpio -p linux
 
 echo 'Setting root password'
 passwd
+
+# User creatiion
+read -p "Enter the username: " username
+useradd -m $username
+echo "Creating password for $username"
+passwd $username
+echo '%sudoers    ALL=(ALL) ALL' >> /etc/sudoers
+groupadd sudoers
+gpasswd -a $username sudoers
 
 echo 'Lets pray'
 echo 'Installing GRUB and efibootmgr'
@@ -87,7 +82,8 @@ echo 'Installing sound'
 pacman -S alsa-lib alsa-plugins alsa-utils pulseaudio pulseaudio-alsa pulseaudio-bluetooth pavucontrol
 
 echo 'Installing misc'
-pacman -S sudo zsh xfce4-terminal thunar firefox gvfs tumbler thunar-volman thunar-archive-plugin unzip xfce4-goodies
+pacman -S sudo zsh xfce4-terminal thunar firefox gvfs tumbler thunar-volman thunar-archive-plugin unzip xfce4-goodies keepassxc mopidy
+systemctl enable systemd-timesyncd mopidy
 
 echo 'Installing devs'
 pacman -S git vim neovim-qt
@@ -98,18 +94,21 @@ chsh -s /bin/zsh
 
 echo 'Installing polybar'
 echo 'Installing dependencies for polybar'
-pacman -S cairo xcb-util-cursor xcb-util-image xcb-util-wm xcb-util-xrm cmake git pkg-config python python2 alsa-lib curl jsoncpp libmpdclient libnl pulseaudio wireless_tools xorg-fonts-misc gcc clang python-sphinx xcb-proto libxcb libpulse libcurl-compat libcurl-gnutls
+pacman -S cairo xcb-util-cursor xcb-util-image xcb-util-wm xcb-util-xrm cmake git pkg-config python python2 alsa-lib curl jsoncpp libmpdclient libnl pulseaudio wireless_tools xorg-fonts-misc gcc clang python-sphinx xcb-proto libxcb libpulse libcurl-compat libcurl-gnutls fakeroot xorg-xfd
 echo 'Installing fonts from AUR'
-# TODO
-# git clone https://aur.archlinux.org/siji-git.git
-# cd siji-git
-# makepkg -si
-# cd ..
-# TODO
-# git clone https://aur.archlinux.org/ttf-unifont.git
-# cd ttf-unifont
-# makepkg -si
-# cd ..
+sudo -u $username bash<<_
+cd /tmp
+git clone https://aur.archlinux.org/siji-git.git
+cd siji-git
+makepkg -si --skippgpcheck
+Y
+cd ..
+git clone https://aur.archlinux.org/ttf-unifont.git
+cd ttf-unifont
+makepkg -si --skippgpcheck
+Y
+cd ..
+_
 git clone https://github.com/polybar/polybar --recursive
 cd polybar
 mkdir build
@@ -118,7 +117,3 @@ cmake ..
 make -j$(nproc)
 make install
 cd ..
-
-echo 'Getting dot files'
-git clone $DOTFILE_REPO
-

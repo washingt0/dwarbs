@@ -52,6 +52,7 @@ grub-mkconfig -o /boot/grub/grub.cfg
 
 echo 'Enabling multilib'
 sed -i '/^#\[multilib\]$/ {N; s/#\[multilib\]\n#/\[multilib\]\n/}' /etc/pacman.conf
+pacman -Sy
 
 echo 'Installing X-basic'
 pacman -S xorg-server xorg-server-common xf86-video-intel mesa lib32-mesa lightdm lightdm-gtk-greeter accountsservice xorg-xrandr arandr compton xorg-xprop xorg-drivers
@@ -82,11 +83,11 @@ echo 'Installing sound'
 pacman -S alsa-lib alsa-plugins alsa-utils pulseaudio pulseaudio-alsa pulseaudio-bluetooth pavucontrol
 
 echo 'Installing misc'
-pacman -S sudo zsh xfce4-terminal thunar firefox gvfs tumbler thunar-volman thunar-archive-plugin unzip xfce4-goodies keepassxc mopidy
-systemctl enable systemd-timesyncd mopidy
+pacman -S sudo zsh xfce4-terminal thunar firefox gvfs tumbler thunar-volman thunar-archive-plugin unzip xfce4-goodies keepassxc mopidy sshfs openssh vlc smbclient redshift python-xdg python-pip gvfs-smb gvfs-nfs gpa zip xarchiver
+systemctl enable systemd-timesyncd
 
 echo 'Installing devs'
-pacman -S git vim neovim-qt
+pacman -S git vim neovim-qt xfce4-settings htop strace lsof xfce4-power-manager cantarell-fonts noto-fonts gnu-free-fonts powerline-fonts awesome-terminal-fonts python-pywal go go-tools godep xsel guake ranger mc ttf-ubuntu-font-family
 
 echo 'Setting defaults'
 echo 'Default shell'
@@ -108,6 +109,7 @@ cd ttf-unifont
 makepkg -si --skippgpcheck
 Y
 cd ..
+chsh -s /bin/zsh
 _
 git clone https://github.com/polybar/polybar --recursive
 cd polybar
@@ -117,3 +119,14 @@ cmake ..
 make -j$(nproc)
 make install
 cd ..
+
+git clone https://github.com/stark/siji
+cd siji
+./install.sh
+
+# Fonts
+xset +fp /home/$USER/.local/share/fonts
+xset fp rehash
+
+# Install vim-plug
+curl -fLo $HOME/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim

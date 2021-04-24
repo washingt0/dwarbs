@@ -18,7 +18,7 @@ echo 'Partitions'
 fdisk -l
 
 echo 'Running pacstrap with base'
-pacstrap /mnt base
+pacstrap /mnt base linux linux-firmware
 
 echo 'Generating fstab'
 genfstab -U /mnt >> /mnt/etc/fstab

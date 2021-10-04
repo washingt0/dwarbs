@@ -87,7 +87,7 @@ pacman -S sudo zsh xfce4-terminal thunar firefox gvfs tumbler thunar-volman thun
 systemctl enable systemd-timesyncd
 
 echo 'Installing devs'
-pacman -S git vim neovim-qt xfce4-settings htop strace lsof xfce4-power-manager cantarell-fonts noto-fonts gnu-free-fonts powerline-fonts awesome-terminal-fonts python-pywal go go-tools godep xsel guake ranger mc ttf-ubuntu-font-family
+pacman -S git vim neovim-qt xfce4-settings htop strace lsof xfce4-power-manager cantarell-fonts noto-fonts gnu-free-fonts powerline-fonts awesome-terminal-fonts python-pywal go go-tools godep xsel guake ranger mc ttf-ubuntu-font-family adobe-source-han-sans-otc-fonts-2.004-1 noto-fonts-emoji noto-fonts-extra
 
 echo 'Setting defaults'
 echo 'Default shell'
